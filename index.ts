@@ -2,21 +2,92 @@ import fs from 'fs'
 import path from 'path'
 import PizZip from 'pizzip'
 import Docxtemplater from 'docxtemplater'
+import { DocxOptions } from './domain/DocxOptions/index.js'
+import {
+  RentReviewOptions2,
+  RentReviewOptions,
+  RentReviewData1,
+  RentReviewData2
+} from './domain/RentReview/index.js'
+import {
+  GabrielRentReviewData1,
+  GabrielRentReviewOptions
+} from './domain/RentReview/GabrielRentReview/index.js'
 
-// Charge le template .docx
-const templatePath = path.resolve(
-  '/home/gab/apps/250309-publipostage',
-  'template.docx'
-)
-const content = fs.readFileSync(templatePath, 'binary')
+class Docx {
+  options: DocxOptions
+  constructor(options: DocxOptions) {
+    this.options = options
+  }
+  generate() {
+    const { templatePath, filtePath, data } = this.options
 
-const zip = new PizZip(content)
-const doc = new Docxtemplater(zip, {
-  paragraphLoop: true,
-  linebreaks: true
-})
+    // Charge le template .docx
+    const content = fs.readFileSync(templatePath, 'binary')
+    const zip = new PizZip(content)
+    const doc = new Docxtemplater(zip, {
+      paragraphLoop: true,
+      linebreaks: true
+    })
 
-// Données à injecter dans les { variables }
+    try {
+      doc.render(data)
+    } catch (error: any) {
+      console.error('Erreur de génération :', error)
+    }
+
+    const outputBuffer = doc.getZip().generate({ type: 'nodebuffer' })
+    fs.writeFileSync(this.options.filtePath, outputBuffer)
+
+    console.log('✅ Document généré :', this.options.filtePath)
+  }
+}
+
+class RentReview extends Docx {
+  options: RentReviewOptions2
+  constructor(options: RentReviewOptions) {
+    super(options)
+    const newData = this.transformData(options.data)
+    this.options.data = newData
+  }
+  toFrenchNumber(num: number) {
+    return num.toFixed(2).replace('.', ',')
+  }
+  transformData(data: RentReviewData1): RentReviewData2 {
+    const NIND = this.toFrenchNumber(data.nind)
+    const AI = this.toFrenchNumber(data.ai)
+    const LHC = this.toFrenchNumber(data.lhc)
+    const nlhc = data.lhc * (data.nind / data.ai)
+    const NLHC = this.toFrenchNumber(nlhc)
+    const CHARGES = this.toFrenchNumber(data.charges)
+    const NOUVEAU_LOYER = this.toFrenchNumber(nlhc + data.charges)
+    return {
+      ...data,
+      NIND,
+      AI,
+      LHC,
+      CHARGES,
+      NLHC,
+      NOUVEAU_LOYER
+    }
+  }
+}
+
+class GabrielRentReview extends RentReview {
+  constructor(options: GabrielRentReviewOptions) {
+    const newOptions: RentReviewOptions = {
+      ...options,
+      data: {
+        ...options.data,
+        BAILLEUR: 'Gabriel BRUN\n259 rue de Wallers\n59590 RAISMES',
+        SIGNATURE: 'Gabriel BRUN'
+      }
+    }
+    super(newOptions)
+  }
+}
+
+// DATA
 // BAILLEUR: 'SCI LOGIS ANGE\n259 rue de Wallers\n59590 RAISMES',
 const BAILLEUR = 'Gabriel BRUN\n259 rue de Wallers\n59590 RAISMES'
 
@@ -33,46 +104,43 @@ const TYPE_INDICE = 'Indice de Référence des Loyers (IRL)'
 const TRIMESTRE = '1er'
 
 const nind = 145.47
-const NIND = nind.toFixed(2).replace('.', ',')
 const ai = 143.46
-const AI = ai.toFixed(2).replace('.', ',')
 
 const lhc = 457.7
-const LHC = lhc.toFixed(2).replace('.', ',')
-const nlhc = lhc * (nind / ai)
-const NLHC = nlhc.toFixed(2).replace('.', ',')
 const charges = 0
-const CHARGES = charges.toFixed(2).replace('.', ',')
-const NOUVEAU_LOYER = (nlhc + charges).toFixed(2).replace('.', ',')
 const REGLEMENT = 'juin 2025'
 
 // SIGNATURE: 'Gabriel Brun, gérant de la SCI LOGIS ANGE'
 const SIGNATURE = 'Gabriel BRUN'
 
-doc.setData({
-  BAILLEUR,
+const data: GabrielRentReviewData1 = {
+  // BAILLEUR,
   CIVILITÉ,
   LOCATAIRE,
   DATE_COURRIER,
   TYPE_INDICE,
   TRIMESTRE,
-  NIND,
-  AI,
-  LHC,
-  NLHC,
-  CHARGES,
-  NOUVEAU_LOYER,
-  REGLEMENT,
-  SIGNATURE
-})
 
-try {
-  doc.render() // Remplacement des balises
-} catch (error: any) {
-  console.error('Erreur de génération :', error)
+  nind,
+  ai,
+  lhc,
+  charges,
+
+  REGLEMENT
+  // SIGNATURE
 }
 
-const outputBuffer = doc.getZip().generate({ type: 'nodebuffer' })
-fs.writeFileSync('revision-loyer.docx', outputBuffer)
-
-console.log('✅ Document généré : revision-loyer.docx')
+// CREATE DOCX
+new GabrielRentReview({
+  templatePath: path.resolve(
+    '/home/gab/apps/250309-publipostage',
+    'templates',
+    'template.docx'
+  ),
+  filtePath: path.resolve(
+    '/home/gab/apps/250309-publipostage',
+    'output',
+    'revision-loyer.docx'
+  ),
+  data
+}).generate()
