@@ -41,7 +41,7 @@ class Docx {
     }
 
     const outputBuffer = doc.getZip().generate({ type: 'nodebuffer' })
-    fs.writeFileSync(this.options.filtePath, outputBuffer)
+    fs.writeFileSync(filtePath, outputBuffer)
 
     console.log('✅ Document généré :', this.options.filtePath)
   }
