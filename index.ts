@@ -1,48 +1,53 @@
+// index.ts
 import { Document, Packer, Paragraph, TextRun } from 'docx'
-import * as fs from 'fs'
-import * as path from 'path'
+import { writeFileSync } from 'fs'
 
-const names = ['Marie', 'Louis']
-const outputDir = path.join('/home/gab/apps/250309-publipostage', 'invitations')
+// === Données de la révision de loyer ===
+const nomLocataire = 'Jean Dupont'
+const adresseLocation = '12 rue de la Paix, 75001 Paris'
+const dateRevision = '1er mai 2025'
+const loyerActuel = 750
+const nouveauLoyer = 780
 
-// Créer le dossier s'il n'existe pas
-if (!fs.existsSync(outputDir)) {
-  fs.mkdirSync(outputDir)
-}
-
-names.forEach((name) => {
-  const doc = new Document({
-    sections: [
-      {
-        properties: {},
-        children: [
-          new Paragraph({
-            children: [
-              new TextRun({
-                text: `Cher(e) ${name},`,
-                bold: true,
-                size: 28
-              })
-            ]
-          }),
-          new Paragraph('\n'),
-          new Paragraph("Tu es invité(e) à l'anniversaire de ma fille ! 🎉"),
-          new Paragraph('\n'),
-          new Paragraph('Date : Samedi 15 juin 2024'),
-          new Paragraph('Heure : 15h00'),
-          new Paragraph('Lieu : Notre maison'),
-          new Paragraph('\n'),
-          new Paragraph('On espère te voir ! 😊')
-        ]
-      }
-    ]
-  })
-
-  const filePath = path.join(outputDir, `${name}_invitation.docx`)
-  Packer.toBuffer(doc).then((buffer) => {
-    fs.writeFileSync(filePath, buffer)
-    console.log(`Invitation générée : ${filePath}`)
-  })
+// === Contenu du document ===
+const doc = new Document({
+  sections: [
+    {
+      children: [
+        new Paragraph({
+          children: [
+            new TextRun({
+              text: 'Notification de révision de loyer',
+              bold: true,
+              size: 32
+            })
+          ]
+        }),
+        new Paragraph({ text: '' }),
+        new Paragraph(`À l'attention de : ${nomLocataire}`),
+        new Paragraph(`Adresse du logement : ${adresseLocation}`),
+        new Paragraph({ text: '' }),
+        new Paragraph(
+          `Conformément aux dispositions du bail, nous vous informons que le loyer sera révisé à compter du ${dateRevision}.`
+        ),
+        new Paragraph(
+          `Le loyer mensuel passera de ${loyerActuel} € à ${nouveauLoyer} € par mois.`
+        ),
+        new Paragraph({ text: '' }),
+        new Paragraph(
+          "Cette révision respecte l'indice de référence des loyers (IRL) en vigueur."
+        ),
+        new Paragraph({ text: '' }),
+        new Paragraph(
+          "Veuillez agréer, Madame, Monsieur, l'expression de nos salutations distinguées."
+        )
+      ]
+    }
+  ]
 })
 
-console.log('xxx')
+// === Génération du fichier .docx ===
+Packer.toBuffer(doc).then((buffer) => {
+  writeFileSync('revision-loyer.docx', buffer)
+  console.log("✅ Fichier 'revision-loyer.docx' généré avec succès !")
+})
