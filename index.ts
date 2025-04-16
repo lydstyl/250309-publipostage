@@ -1,6 +1,8 @@
 import { StAmandRentReview } from './application/GabrielRentReview.js'
 import { LogisAngeRentReview } from './application/LogisAngeRentReview.js'
 
+// todo new MailMerge
+
 // CREATE DOCX
 new StAmandRentReview({
   DATE_COURRIER: '16/04/2025',

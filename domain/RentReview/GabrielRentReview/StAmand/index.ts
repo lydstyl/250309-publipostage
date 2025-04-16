@@ -1,11 +1,7 @@
-import { DocxOptions } from '../../../DocxOptions/index.js'
-
 export type StAmandRentReviewData1 = {
   CIVILITÉ: string
-  //   LOCATAIRE: string
-  LOCATAIRE_NOM: string // on sait l'adresse mais pas le nom du locataire
+  LOCATAIRE_NOM: string
   DATE_COURRIER: string
-  //   TYPE_INDICE: string
   TRIMESTRE: string
   REGLEMENT: string
 
