@@ -5,7 +5,9 @@
   },
   "dependencies": {
     "@types/node": "^22.13.10",
-    "docx": "^9.3.0"
+    "docx": "^9.3.0",
+    "docxtemplater": "^3.61.1",
+    "pizzip": "^3.1.8"
   },
   "devDependencies": {
     "ts-node": "^10.9.2",
