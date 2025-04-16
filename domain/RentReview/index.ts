@@ -5,7 +5,6 @@ export type CommonRentReviewData = {
   CIVILITÉ: string
   LOCATAIRE: string
   DATE_COURRIER: string
-  TYPE_INDICE: string
   TRIMESTRE: string
   REGLEMENT: string
   SIGNATURE: string
@@ -23,10 +22,9 @@ export type RentReviewData2 = CommonRentReviewData & {
   NLHC: string
   CHARGES: string
   NOUVEAU_LOYER: string
+  TYPE_INDICE: string
 }
-export type RentReviewOptions = DocxOptions & {
-  data: RentReviewData1
-}
+// export type RentReviewOptions = RentReviewData1
 export type RentReviewOptions2 = DocxOptions & {
   data: RentReviewData2
 }

@@ -5,7 +5,7 @@ export type GabrielRentReviewData1 = {
   CIVILITÉ: string
   LOCATAIRE: string
   DATE_COURRIER: string
-  TYPE_INDICE: string
+  //   TYPE_INDICE: string
   TRIMESTRE: string
   REGLEMENT: string
   // SIGNATURE: string

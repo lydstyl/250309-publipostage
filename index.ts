@@ -5,7 +5,6 @@ import Docxtemplater from 'docxtemplater'
 import { DocxOptions } from './domain/DocxOptions/index.js'
 import {
   RentReviewOptions2,
-  RentReviewOptions,
   RentReviewData1,
   RentReviewData2
 } from './domain/RentReview/index.js'
@@ -13,6 +12,11 @@ import {
   GabrielRentReviewData1,
   GabrielRentReviewOptions
 } from './domain/RentReview/GabrielRentReview/index.js'
+import {
+  StAmandRentReviewData1,
+  StAmandRentReviewOptions
+} from './domain/RentReview/GabrielRentReview/StAmand/index.js'
+import { LogisAngeRentReviewOptions } from './domain/RentReview/LogisAngeRentReview/index.js'
 
 class Docx {
   options: DocxOptions
@@ -45,9 +49,23 @@ class Docx {
 
 class RentReview extends Docx {
   options: RentReviewOptions2
-  constructor(options: RentReviewOptions) {
-    super(options)
-    const newData = this.transformData(options.data)
+  constructor(data: RentReviewData1) {
+    const templatePath = path.resolve(
+      '/home/gab/apps/250309-publipostage',
+      'templates',
+      'template.docx'
+    )
+    const filtePath = path.resolve(
+      '/home/gab/apps/250309-publipostage',
+      'output',
+      'revision-loyer.docx'
+    )
+    super({
+      templatePath,
+      filtePath,
+      data: {}
+    })
+    const newData = this.transformData(data)
     this.options.data = newData
   }
   toFrenchNumber(num: number) {
@@ -68,79 +86,63 @@ class RentReview extends Docx {
       LHC,
       CHARGES,
       NLHC,
-      NOUVEAU_LOYER
+      NOUVEAU_LOYER,
+      TYPE_INDICE: 'Indice de Référence des Loyers (IRL)' // change only for commercial local
     }
   }
 }
 
 class GabrielRentReview extends RentReview {
-  constructor(options: GabrielRentReviewOptions) {
-    const newOptions: RentReviewOptions = {
-      ...options,
-      data: {
-        ...options.data,
-        BAILLEUR: 'Gabriel BRUN\n259 rue de Wallers\n59590 RAISMES',
-        SIGNATURE: 'Gabriel BRUN'
-      }
+  constructor(data: GabrielRentReviewData1) {
+    const newData: RentReviewData1 = {
+      ...data,
+      BAILLEUR: 'Gabriel BRUN\n259 rue de Wallers\n59590 RAISMES',
+      SIGNATURE: 'Gabriel BRUN'
+    }
+    super(newData)
+  }
+}
+class StAmandRentReview extends GabrielRentReview {
+  constructor(data: StAmandRentReviewData1) {
+    const newOptions: GabrielRentReviewData1 = {
+      ...data,
+      LOCATAIRE: `${data.LOCATAIRE_NOM}\n1 bis cour Patrice\n59230 ST AMAND LES EAUX`
     }
     super(newOptions)
   }
 }
 
-// DATA
-// BAILLEUR: 'SCI LOGIS ANGE\n259 rue de Wallers\n59590 RAISMES',
-const BAILLEUR = 'Gabriel BRUN\n259 rue de Wallers\n59590 RAISMES'
+// // class LogisAngeRentReview extends xx {
+// class LogisAngeRentReview extends RentReview {
+//   constructor(options: LogisAngeRentReviewOptions) {
+//     const newOptions: RentReviewOptions = {
+//       ...options,
+//       data: {
+//         ...options.data,
+//         BAILLEUR: 'SCI LOGIS ANGE\n259 rue de Wallers\n59590 RAISMES',
+//         SIGNATURE: 'Gabriel Brun, gérant de la SCI LOGIS ANGE'
+//       }
+//     }
+//     super(newOptions)
+//   }
+// }
 
-const CIVILITÉ = 'Monsieur'
-// LOCATAIRE= 'ZUREK\nAppartement n°3\n32 B rue Henri Durre\n59590 RAISMES'
-const LOCATAIRE =
-  'TESTELIN Cyrille\n1 bis cour Patrice\n59230 ST AMAND LES EAUX'
-
-const DATE_COURRIER = '16/04/2025'
-
-const TYPE_INDICE = 'Indice de Référence des Loyers (IRL)'
-
-// TRIMESTRE= '2ᵉ'
-const TRIMESTRE = '1er'
-
-const nind = 145.47
-const ai = 143.46
-
-const lhc = 457.7
-const charges = 0
-const REGLEMENT = 'juin 2025'
-
-// SIGNATURE: 'Gabriel Brun, gérant de la SCI LOGIS ANGE'
-const SIGNATURE = 'Gabriel BRUN'
-
-const data: GabrielRentReviewData1 = {
-  // BAILLEUR,
-  CIVILITÉ,
-  LOCATAIRE,
-  DATE_COURRIER,
-  TYPE_INDICE,
-  TRIMESTRE,
-
-  nind,
-  ai,
-  lhc,
-  charges,
-
-  REGLEMENT
-  // SIGNATURE
-}
+// class Appart4RentReview extends LogisAngeRentReview {
+// class LeducRentReview extends Appart4RentReview {
 
 // CREATE DOCX
-new GabrielRentReview({
-  templatePath: path.resolve(
-    '/home/gab/apps/250309-publipostage',
-    'templates',
-    'template.docx'
-  ),
-  filtePath: path.resolve(
-    '/home/gab/apps/250309-publipostage',
-    'output',
-    'revision-loyer.docx'
-  ),
-  data
+
+new StAmandRentReview({
+  DATE_COURRIER: '16/04/2025',
+
+  CIVILITÉ: 'Monsieur',
+  LOCATAIRE_NOM: 'TESTELIN Cyrille',
+  TRIMESTRE: '1er',
+
+  nind: 145.47,
+  ai: 143.46,
+  lhc: 457.7,
+  charges: 0,
+
+  REGLEMENT: 'juin 2025'
 }).generate()
