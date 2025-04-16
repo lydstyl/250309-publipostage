@@ -8,15 +8,9 @@ import {
   RentReviewData1,
   RentReviewData2
 } from './domain/RentReview/index.js'
-import {
-  GabrielRentReviewData1,
-  GabrielRentReviewOptions
-} from './domain/RentReview/GabrielRentReview/index.js'
-import {
-  StAmandRentReviewData1,
-  StAmandRentReviewOptions
-} from './domain/RentReview/GabrielRentReview/StAmand/index.js'
-import { LogisAngeRentReviewOptions } from './domain/RentReview/LogisAngeRentReview/index.js'
+import { GabrielRentReviewData1 } from './domain/RentReview/GabrielRentReview/index.js'
+import { StAmandRentReviewData1 } from './domain/RentReview/GabrielRentReview/StAmand/index.js'
+import { LogisAngeRentReviewData1 } from './domain/RentReview/LogisAngeRentReview/index.js'
 
 class Docx {
   options: DocxOptions
@@ -112,23 +106,29 @@ class StAmandRentReview extends GabrielRentReview {
   }
 }
 
-// // class LogisAngeRentReview extends xx {
-// class LogisAngeRentReview extends RentReview {
-//   constructor(options: LogisAngeRentReviewOptions) {
-//     const newOptions: RentReviewOptions = {
-//       ...options,
-//       data: {
-//         ...options.data,
-//         BAILLEUR: 'SCI LOGIS ANGE\n259 rue de Wallers\n59590 RAISMES',
-//         SIGNATURE: 'Gabriel Brun, gérant de la SCI LOGIS ANGE'
-//       }
-//     }
-//     super(newOptions)
-//   }
-// }
+// todo class RoubaixRentReview
 
-// class Appart4RentReview extends LogisAngeRentReview {
-// class LeducRentReview extends Appart4RentReview {
+class LogisAngeRentReview extends RentReview {
+  constructor(data: LogisAngeRentReviewData1) {
+    const addresses = [
+      '32 rue Henrie Durre\n59590 RAISMES',
+      '32 A rue Henrie Durre\n59590 RAISMES',
+      '32 B rue Henrie Durre\nAppartement n°3\n59590 RAISMES',
+      '32 B rue Henrie Durre\nAppartement n°4\n59590 RAISMES',
+      '32 B rue Henrie Durre\nAppartement n°5\n59590 RAISMES',
+      '32 B rue Henrie Durre\nAppartement n°6\n59590 RAISMES'
+    ]
+    const LOCATAIRE = `${data.LOCATAIRE_NOM}\n${addresses[data.LOT]}`
+
+    const newData: RentReviewData1 = {
+      ...data,
+      LOCATAIRE,
+      BAILLEUR: 'SCI LOGIS ANGE\n259 rue de Wallers\n59590 RAISMES',
+      SIGNATURE: 'Gabriel Brun, gérant de la SCI LOGIS ANGE'
+    }
+    super(newData)
+  }
+}
 
 // CREATE DOCX
 
@@ -146,3 +146,20 @@ new StAmandRentReview({
 
   REGLEMENT: 'juin 2025'
 }).generate()
+
+// new LogisAngeRentReview({
+//   DATE_COURRIER: '16/04/2025',
+
+//   LOT: 4,
+
+//   CIVILITÉ: 'Monsieur',
+//   LOCATAIRE_NOM: 'LEDUC Christian',
+//   TRIMESTRE: '1er', // changer
+
+//   nind: 145.47, // changer
+//   ai: 143.46, // changer
+//   lhc: 457.7, // changer
+//   charges: 50, // changer
+
+//   REGLEMENT: 'juin 2025' // changer
+// }).generate()

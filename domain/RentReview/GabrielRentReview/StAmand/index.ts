@@ -14,6 +14,3 @@ export type StAmandRentReviewData1 = {
   lhc: number
   charges: number
 }
-export type StAmandRentReviewOptions = DocxOptions & {
-  data: StAmandRentReviewData1
-}

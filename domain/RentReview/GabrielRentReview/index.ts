@@ -15,6 +15,3 @@ export type GabrielRentReviewData1 = {
   lhc: number
   charges: number
 }
-export type GabrielRentReviewOptions = DocxOptions & {
-  data: GabrielRentReviewData1
-}
