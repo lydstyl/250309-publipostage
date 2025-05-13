@@ -12,7 +12,7 @@ export class LogisAngeRentReview extends RentReview {
       '32 B rue Henrie Durre\nAppartement n°5\n59590 RAISMES',
       '32 B rue Henrie Durre\nAppartement n°6\n59590 RAISMES'
     ]
-    const LOCATAIRE = `${data.LOCATAIRE_NOM}\n${addresses[data.LOT]}`
+    const LOCATAIRE = `${data.LOCATAIRE_NOM}\n${addresses[data.LOT - 1]}`
 
     const newData: RentReviewData1 = {
       ...data,
